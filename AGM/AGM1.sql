@@ -12,7 +12,7 @@ CREATE TABLE NHACUNGCAP
 	MaSoThue int not null unique default 0,
 ) 
 
---DROP TABLE DANGKYCUNGCAP
+
 --DROP TABLE NHACUNGCAP
 
 CREATE TABLE LOAIDICHVU
@@ -38,14 +38,15 @@ CREATE TABLE DONGXE
 CREATE TABLE DANGKYCUNGCAP 
 (
 	MaDKCC varchar(10) primary key ,
-	MaNhaCC varchar(10) constraint CHECK_MaNhaCC  foreign key ( MaNhaCC) references NHACUNGCAP(MaNhaCC),
-	MaLoaiDV varchar(10) constraint CHECK_MaLoaiDV  foreign key ( MaLoaiDV) references LOAIDICHVU(MaLoaiDV),
-	DongXe varchar(50) constraint CHECK_DongXe  foreign key (DongXe) references DONGXE(DongXe),
-	MaMP varchar(10) constraint CHECK_MaMP  foreign key ( MaMP) references MUCPHI(MaMP),
+	MaNhaCC varchar(10) constraint CHECK_MaNhaCC  foreign key ( MaNhaCC) references NHACUNGCAP(MaNhaCC) DEFAULT 0,
+	MaLoaiDV varchar(10) constraint CHECK_MaLoaiDV  foreign key ( MaLoaiDV) references LOAIDICHVU(MaLoaiDV) DEFAULT 0,
+	DongXe varchar(50) constraint CHECK_DongXe  foreign key (DongXe) references DONGXE(DongXe) DEFAULT 0,
+	MaMP varchar(10) constraint CHECK_MaMP  foreign key ( MaMP) references MUCPHI(MaMP) DEFAULT 0,
 	NgayBatDauCungCap  date not null default getdate(),
 	NgayKetThucCungCap date not null default getdate()+3,
 	SoLuongXeDangKy int not null default 1,
 )
+--DROP TABLE DANGKYCUNGCAP
 --drop table DANGKYCUNGCAP,DONGXE,LOAIDICHVU,MUCPHI,NHACUNGCAP
 -- INSERT DATA NHACUNGCAP
 INSERT INTO NHACUNGCAP
@@ -104,7 +105,11 @@ VALUES
 ('DK007','NCC007','DV01','Vios','MP01','2015/01/12','2016/11/20','4'),
 ('DK008','NCC001','DV03','Grand-i10','MP01','2015/10/22','2016/11/20','7'),
 ('DK009','NCC009','DV02','Forte','MP04','2018/03/08','2019/10/12','1'),
-('DK0010','NCC006','DV02','Escape','MP01','2015/10/11','2019/11/20','2')
+('DK010','NCC006','DV02','Escape','MP01','2015/10/11','2019/11/20','2')
+
+UPDATE DANGKYCUNGCAP
+SET MaDKCC='DK010'
+WHERE MaNhaCC='NCC006'
 
 DELETE FROM DANGKYCUNGCAP
 --drop table MUCPHI
@@ -117,6 +122,11 @@ Câu 4: Liệt kê thông tin của các nhà cung cấp -- đã từng đăng k
 thuộc hãng xe “Toyota”-- với mức phí có đơn giá là 15.000 VNĐ/km hoặc những dòng xe
 thuộc hãng xe “KIA” với mức phí có đơn giá là 20.000 VNĐ/km */
 --select * from NHACUNGCAP as NPC
+
+SELECT * FROM NHACUNGCAP AS NCC
+JOIN DANGKYCUNGCAP AS DKCC ON NCC.MaNhaCC = DKCC.MaNhaCC
+WHERE DKCC.DongXe IN (SELECT DONGXE.DongXe FROM DONGXE WHERE DONGXE.HangXe='Toyota') 
+AND DKCC.MaMP IN (SELECT MUCPHI.MaMP FROM MUCPHI WHERE MUCPHI.DonGia=15000)
 
 SELECT * FROM NHACUNGCAP AS NCC
 JOIN DANGKYCUNGCAP AS DKCC ON NCC.MaNhaCC = DKCC.MaNhaCC
@@ -143,14 +153,33 @@ HAVING COUNT (DKCC.MaNhaCC) >=0
 
 /*Câu 7: Liệt kê tên của toàn bộ các hãng xe có trong cơ sở dữ liệu với yêu cầu mỗi hãng xe
 chỉ được liệt kê một lần*/
+select * FROM DANGKYCUNGCAP,NHACUNGCAP
 
 /*Câu 8: Liệt kê MaDKCC, MaNhaCC, TenNhaCC, DiaChi, MaSoThue, TenLoaiDV, DonGia,
 HangXe, NgayBatDauCC, NgayKetThucCC của tất cả các lần đăng ký cung cấp phương
 tiện với yêu cầu những nhà cung cấp nào chưa từng thực hiện đăng ký cung cấp phương
 tiện thì cũng liệt kê thông tin những nhà cung cấp đó ra*/
 
+SELECT *
+FROM DANGKYCUNGCAP  AS DKCC 
+LEFT JOIN NHACUNGCAP AS NCC
+ON DKCC.MaNhaCC = NCC.MaNhaCC 
+ORDER BY DKCC.MaNhaCC;
+
+SELECT * FROM DANGKYCUNGCAP AS DKCC JOIN NHACUNGCAP AS NCC
+ON DKCC.MaNhaCC = NCC.MaNhaCC 
+
 /*Câu 9: Liệt kê thông tin của các nhà cung cấp đã từng đăng ký cung cấp phương tiện
 thuộc dòng xe “Hiace” hoặc từng đăng ký cung cấp phương tiện thuộc dòng xe “Cerato”*/
 
+SELECT * FROM NHACUNGCAP AS NCC
+JOIN DANGKYCUNGCAP AS DKCC ON NCC.MaNhaCC = DKCC.MaNhaCC
+WHERE DKCC.DongXe like 'Hiace' or DKCC.DongXe like 'Cerato'
+
 /*Câu 10: Liệt kê thông tin của các nhà cung cấp chưa từng thực hiện đăng ký cung cấp
 phương tiện lần nào cả.*/
+
+SELECT * FROM NHACUNGCAP AS NCC
+WHERE NCC.MaNhaCC NOT IN (SELECT MaNhaCC FROM DANGKYCUNGCAP)
+
+
