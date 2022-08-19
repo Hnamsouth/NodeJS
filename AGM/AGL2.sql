@@ -1,4 +1,5 @@
 ﻿CREATE DATABASE ASM1_T2204M
+-- ctrl + g : go to  line number
 
 USE ASM1_T2204M
 --  TABLE-1
@@ -57,9 +58,7 @@ INSERT INTO CUSTEMERS VALUES
 ('0988888888',N'Ngô Văn C',N'Tầng Hầm B1- TTTM The Garden, Phường, Từ Liêm, Hà Nội'),
 ('0977777777',N'Lò Văn D',N'8a Tôn Thất Thuyết, Mỹ Đình, Cầu Giấy, Hà Nội'),
 ('0966666666',N'Vội Thị E',N'8a Tôn Thất Thuyết, Mỹ Đình, Cầu Giấy, Hà Nội'),
-('0955555555',N'Nguyễn Văn F',N'8a Tôn Thất Thuyết, Mỹ Đình, Cầu Giấy, Hà Nội')
-
-INSERT INTO CUSTEMERS VALUES
+('0955555555',N'Nguyễn Văn F',N'8a Tôn Thất Thuyết, Mỹ Đình, Cầu Giấy, Hà Nội'),
 ('0911111111',N'Chân Văn Thật',N'56 Nguyễn N, Thanh Xuân, Hà Nội'),
 ('0922222222',N'Vập thị ngã',N'111 C Trãi,  Xuân Thanh, Nội Hà '),
 ('0933333333',N'Nguyễn Văn s',N'111 D Nguyễn, Thanh Xuân1, Hà Nội2')
@@ -141,7 +140,64 @@ WHERE OrderID = 123
 	GROUP BY OrderID 
 
 --a) Viết câu lệnh để thay đổi trường giá tiền của từng mặt hàng là dương(>0).
+	ALTER TABLE PRODUCT
+	ALTER COLUMN PRICE ADD CONSTRAINT C_PR_PRICE CHECK(PRICE >0)
 
 --b) Viết câu lệnh để thay đổi ngày đặt hàng của khách hàng phải nhỏ hơn ngày hiện tại.
 	
 --c) Viết câu lệnh để thêm trường ngày xuất hiện trên thị trường của sản phẩm.
+
+8. Thực hiện các yêu cầu sau
+--a) Đặt chỉ mục (index) cho cột Tên hàng và Người đặt hàng để tăng tốc độ truy vấn dữ liệu trêncác cột này.
+CREATE INDEX Name_Product
+ON PRODUCT (Name)
+CREATE INDEX Name_CTM
+ON CUSTEMERS (Name)
+--b) Xây dựng các view sau đây:
+
+--View_KhachHang với các cột: Tên khách hàng, Địa chỉ, Điện thoại
+CREATE VIEW [View_KhachHang]  AS
+SELECT Name ,Address,PhoneNB
+FROM CUSTEMERS
+SELECT * FROM [View_KhachHang]
+
+-- View_SanPham với các cột: Tên sản phẩm, Giá bán
+CREATE VIEW View_SanPham  AS
+SELECT Name ,PRICE
+FROM PRODUCT
+SELECT * FROM View_SanPham
+
+-- View_KhachHang_SanPham với các cột: Tên khách hàng, Số điện thoại, Tên sảnphẩm, Số lượng, Ngày mua
+CREATE VIEW View_CTM_PR  AS
+SELECT CUSTEMERS.Name AS CTMNAME , PRODUCT.NAME AS PRDNAME
+FROM PRODUCT,CUSTEMERS
+SELECT * FROM View_CTM_PR
+
+-- Viết các Store Procedure (Thủ tục lưu trữ) sau:
+-- (Thủ tục lưu trữ) tương tự như 1 tạo 1 function vd để tính tổng a,b có thể tái sử dụng nhiều lần chỉ cần gọi hàm đó
+-- SP_TimKH_MaKH: Tìm khách hàng theo mã khách hàng
+CREATE PROCEDURE SP_TimKH_MaKH @MaKH  VARCHAR(20) AS
+SELECT * FROM CUSTEMERS
+WHERE CUSTEMERS.PhoneNB = @MaKH;
+-- THỰC THI 
+EXEC SP_TimKH_MaKH @MaKH ='0977777777';
+
+-- SP_TimKH_MaHD: Tìm thông tin khách hàng theo mã hóa đơn
+CREATE PROCEDURE SP_TimKH_MaHD @ODID INT AS
+SELECT * FROM CUSTEMERS
+WHERE  CUSTEMERS.PhoneNB = (SELECT ORDERS.CustemersID FROM ORDERS WHERE ORDERS.OrderID=@ODID)
+
+EXEC SP_TimKH_MaHD @ODID=123;
+--DROP PROCEDURE  SP_SanPham_MaKH
+
+-- SP_SanPham_MaKH: Liệt kê các sản phẩm được mua bởi khách hàng có mã đượctruyền vào Store.CREATE PROCEDURE SP_SanPham_MaKH @MKH VARCHAR(20) AS
+SELECT * FROM PRODUCT
+WHERE  PRODUCT.ID IN 
+(SELECT PO.ProductID FROM PRODUCT_ORDERS AS PO
+WHERE PO.OrderID = 
+(SELECT OD.OrderID FROM ORDERS AS OD
+WHERE OD.CustemersID =
+(SELECT CTM.PhoneNB FROM CUSTEMERS AS CTM
+WHERE CTM.PhoneNB LIKE @MKH)))
+
+EXEC SP_SanPham_MaKH @MKH = '0912345678'
