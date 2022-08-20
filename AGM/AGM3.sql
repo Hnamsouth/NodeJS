@@ -46,8 +46,8 @@ INSERT INTO PRODUCT(Name,Content,Unit,Price,Amount,BrandID) VALUES
 (N'Máy Ảnh SONY01',N'lâu lâu dễ hỏng ',N'Chiếc',1000,50,888)	--5
 
 INSERT INTO PRODUCT(Name,Content,Unit,Price,Amount,BrandID) VALUES
-(N'Điện Thoại bấm bấm',N'nó kìa ',N'Chiếc',400,1,666),	
 (N'Máy Tính Dell03',N'DELL Bảo hành chọn đời ',N'Chiếc',700,0,222),
+(N'Điện Thoại bấm bấm',N'nó kìa ',N'Chiếc',400,1,666),	
 (N'Máy Tính T450',N'Máy nhập mới ',N'Chiếc',1000,10,111)
 delete from PRODUCT
 
@@ -153,8 +153,6 @@ BEGIN
 	END
 END
 
-
-
 -- OR CACH 2
 CREATE TRIGGER XOASP2
 ON PRODUCT FOR DELETE AS
@@ -167,11 +165,8 @@ BEGIN
 		ROLLBACK TRAN
 	END
 END
---DROP TRIGGER XOASP2
 
-DELETE FROM PRODUCT WHERE Price = 200
---DROP TRIGGER TG_Xoa_SANPHAM
---DROP TRIGGER TG_Xoa_Hang
+DELETE FROM PRODUCT WHERE Amount = 0
 
 --◦ TG_Xoa_Hang: Ngăn không cho xóa hãng
 CREATE TRIGGER TG_Xoa_Hang
@@ -185,4 +180,8 @@ BEGIN
 END
 -- VỚI NHỮNG ROW ĐÃ ĐƯỢC KHÓA NGOẠI THAM CHIẾU TỚI THÌ SẼ KO XÓA ĐƯỢC MÀ KO CẦN TỚI TRIGGER(VÌ ĐÃ BỊ RÀNG BUỘC)
 DELETE FROM BRAND WHERE BRAND.ID = 111
+
+--DROP TRIGGER XOASP2
+--DROP TRIGGER TG_Xoa_SANPHAM
+--DROP TRIGGER TG_Xoa_Hang
 
