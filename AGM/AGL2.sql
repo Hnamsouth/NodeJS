@@ -155,22 +155,27 @@ CREATE INDEX Name_CTM
 ON CUSTEMERS (Name)
 --b) Xây dựng các view sau đây:
 
+SELECT * FROM CUSTEMERS
+WHERE Name LIKE N'Nguyễn Văn An'
 --View_KhachHang với các cột: Tên khách hàng, Địa chỉ, Điện thoại
 CREATE VIEW [View_KhachHang]  AS
 SELECT Name ,Address,PhoneNB
 FROM CUSTEMERS
 SELECT * FROM [View_KhachHang]
+CREATE INDEX VKH_ID ON View_KhachHang (Name)
 
 -- View_SanPham với các cột: Tên sản phẩm, Giá bán
 CREATE VIEW View_SanPham  AS
 SELECT Name ,PRICE
 FROM PRODUCT
+
 SELECT * FROM View_SanPham
 
 -- View_KhachHang_SanPham với các cột: Tên khách hàng, Số điện thoại, Tên sảnphẩm, Số lượng, Ngày mua
 CREATE VIEW View_CTM_PR  AS
 SELECT CUSTEMERS.Name AS CTMNAME , PRODUCT.NAME AS PRDNAME
 FROM PRODUCT,CUSTEMERS
+
 SELECT * FROM View_CTM_PR
 
 -- Viết các Store Procedure (Thủ tục lưu trữ) sau:
