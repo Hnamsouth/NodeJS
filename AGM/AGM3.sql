@@ -25,6 +25,7 @@ CREATE TABLE PRODUCT
 --SELECT * FROM PRODUCT,BRAND
 -- INSERT DATA BRAND
 INSERT INTO BRAND VALUES
+(123,'TETS TRIGGER','VN','987654'),
 (111,'Asus','USA','999999'),
 (222,'Dell','USA','868686'),
 (333,'Acer','USA','111111'),
@@ -45,8 +46,8 @@ INSERT INTO PRODUCT(Name,Content,Unit,Price,Amount,BrandID) VALUES
 (N'Máy Ảnh SONY01',N'lâu lâu dễ hỏng ',N'Chiếc',1000,50,888)	--5
 
 INSERT INTO PRODUCT(Name,Content,Unit,Price,Amount,BrandID) VALUES
-(N'Điện Thoại bấm bấm',N'nó kìa ',N'Chiếc',400,1,666),	
 (N'Máy Tính Dell03',N'DELL Bảo hành chọn đời ',N'Chiếc',700,0,222),
+(N'Điện Thoại bấm bấm',N'nó kìa ',N'Chiếc',400,1,666),	
 (N'Máy Tính T450',N'Máy nhập mới ',N'Chiếc',1000,10,111)
 delete from PRODUCT
 
@@ -137,13 +138,12 @@ Cho vào hai dữ liệu tưng tự như bảng đề bài trên*/
 
 	EXEC SP_SanPham_HetHang
 --d) Viết Trigger sau:
---◦ TG_Xoa_Hang: Ngăn không cho xóa hãng
+--◦ TG_Xoa_SanPham: Chỉ cho phép xóa các sản phẩm đã hết hàng (số lượng = 0)
 CREATE TRIGGER TG_Xoa_SANPHAM
 ON PRODUCT FOR DELETE 
 AS 
 BEGIN
 	DECLARE @Count int =0
-
 	SELECT  @Count = count(*) FROM deleted
 	WHERE deleted.Amount NOT LIKE 0
 	IF (@Count >0)
@@ -156,29 +156,35 @@ END
 DROP TRIGGER TG_Xoa_SANPHAM
 
 
-
-
---◦ TG_Xoa_SanPham: Chỉ cho phép xóa các sản phẩm đã hết hàng (số lượng = 0)
-
-ALTER TRIGGER TG_Xoa_SANPHAM
-ON PRODUCT FOR DELETE 
-AS 
-BEGIN
-	DECLARE @Count int =0,@ANY INT = 0
-	IF (EXISTS(SELECT * FROM deleted WHERE Amount not like 0 or Price >500))
-	BEGIN 
-		PRINT 'ko duoc xoa'
+-- OR CACH 2
+CREATE TRIGGER XOASP2
+ON PRODUCT FOR DELETE AS
+BEGIN 
+	-- KHI NGƯỜI DÙNG XOA DATA TRONG BẢNG THÌ SẼ TẠO RA 1 BẢNG DELETE VÀ DATA BỊ XÓA SẼ ĐC ĐƯA VÀO ĐÓ
+	-- NẾU BẢNG DELETE TỒN TẠI DATA THÌ SẼ ROLLBACK (QUAY LẠI) KO CHO LỆNH XOA THỰC HIỆN  
+	IF(EXISTS (SELECT * FROM deleted WHERE deleted.Amount not like 0)
+	AND EXISTS (SELECT * FROM deleted WHERE deleted.Price >500))
+	BEGIN
+		PRINT 'KO DUOC PHEP XOA'
 		ROLLBACK TRAN
 	END
 END
 
+DELETE FROM PRODUCT WHERE Price = 400
+
 --DROP TRIGGER TG_Xoa_SANPHAM
+--DROP TRIGGER TG_Xoa_Hang
 
-DELETE FROM PRODUCT WHERE PRODUCT.Price = 400
+--◦ TG_Xoa_Hang: Ngăn không cho xóa hãng
+CREATE TRIGGER TG_Xoa_Hang
+ON BRAND FOR DELETE AS 
+BEGIN
+	IF (EXISTS(SELECT * FROM deleted))
+	BEGIN 
+		PRINT N'KHÔNG ĐƯỢC XOA HÃNG'
+		ROLLBACK TRAN
+	END
+END
+-- VỚI NHỮNG ROW ĐÃ ĐƯỢC KHÓA NGOẠI THAM CHIẾU TỚI THÌ SẼ KO XÓA ĐƯỢC MÀ KO CẦN TỚI TRIGGER(VÌ ĐÃ BỊ RÀNG BUỘC)
+DELETE FROM BRAND WHERE BRAND.ID = 111
 
-DELETE FROM PRODUCT WHERE PRODUCT.Amount = 0
-
-SELECT Amount,Price FROM PRODUCT WHERE Amount LIKE 0 or Price <500
-select * from PRODUCT
-WHERE PRODUCT.Amount NOT LIKE 0 OR PRODUCT.Price > 500 
-GROUP BY Price
