@@ -46,8 +46,8 @@ INSERT INTO PRODUCT(Name,Content,Unit,Price,Amount,BrandID) VALUES
 (N'Máy Ảnh SONY01',N'lâu lâu dễ hỏng ',N'Chiếc',1000,50,888)	--5
 
 INSERT INTO PRODUCT(Name,Content,Unit,Price,Amount,BrandID) VALUES
-(N'Máy Tính Dell03',N'DELL Bảo hành chọn đời ',N'Chiếc',700,0,222),
 (N'Điện Thoại bấm bấm',N'nó kìa ',N'Chiếc',400,1,666),	
+(N'Máy Tính Dell03',N'DELL Bảo hành chọn đời ',N'Chiếc',700,0,222),
 (N'Máy Tính T450',N'Máy nhập mới ',N'Chiếc',1000,10,111)
 delete from PRODUCT
 
@@ -153,7 +153,6 @@ BEGIN
 	END
 END
 
-DROP TRIGGER TG_Xoa_SANPHAM
 
 
 -- OR CACH 2
@@ -162,16 +161,15 @@ ON PRODUCT FOR DELETE AS
 BEGIN 
 	-- KHI NGƯỜI DÙNG XOA DATA TRONG BẢNG THÌ SẼ TẠO RA 1 BẢNG DELETE VÀ DATA BỊ XÓA SẼ ĐC ĐƯA VÀO ĐÓ
 	-- NẾU BẢNG DELETE TỒN TẠI DATA THÌ SẼ ROLLBACK (QUAY LẠI) KO CHO LỆNH XOA THỰC HIỆN  
-	IF(EXISTS (SELECT * FROM deleted WHERE deleted.Amount not like 0)
-	AND EXISTS (SELECT * FROM deleted WHERE deleted.Price >500))
+	IF(EXISTS (SELECT * FROM deleted WHERE deleted.Amount not like 0))
 	BEGIN
 		PRINT 'KO DUOC PHEP XOA'
 		ROLLBACK TRAN
 	END
 END
+--DROP TRIGGER XOASP2
 
-DELETE FROM PRODUCT WHERE Price = 400
-
+DELETE FROM PRODUCT WHERE Price = 200
 --DROP TRIGGER TG_Xoa_SANPHAM
 --DROP TRIGGER TG_Xoa_Hang
 
