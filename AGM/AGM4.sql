@@ -1,5 +1,5 @@
 ﻿CREATE DATABASE AGM4
-
+USE AGM4
 
 CREATE TABLE Type_Product(
 	Mlsp VARCHAR(20) PRIMARY KEY,
@@ -15,8 +15,6 @@ CREATE TABLE Product(
 	Mlsp_TP VARCHAR(20) FOREIGN KEY REFERENCES Type_Product(Mlsp),
 	Manager_ID INT FOREIGN KEY REFERENCES Manager_Product(Id)
 )
-
---drop table Product,Manager_Product,Type_Product
 
 -- INSERT Type_Product
 INSERT INTO Type_Product VALUES
@@ -49,8 +47,7 @@ INSERT INTO Product VALUES
 ('C333 444444','2005/12/22','C333',99999),
 ('C333 333333','2009/10/22','C333',99999),
 ('D444 111111','2009/10/22','D444',66666)
-DELETE FROM Product
-SELECT *,GETDATE() FROM Product WHERE Product.PF_Date >='2009/10/22'
+
 /*Viết các câu lênh truy vấn để*/
 
 --a) Liệt kê danh sách loại sản phẩm của công ty.
@@ -136,4 +133,3 @@ SELECT *,GETDATE() FROM Product WHERE Product.PF_Date >='2009/10/22'
 
 	EXEC SP_Xoa_SanPham_TheoLoai @MALOAISP='Z37E'
 
---USE AGM4
