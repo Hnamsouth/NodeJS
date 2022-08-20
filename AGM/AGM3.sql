@@ -36,16 +36,19 @@ INSERT INTO BRAND VALUES
 
 -- INSERT DATA PRODUCT
 INSERT INTO PRODUCT(Name,Content,Unit,Price,Amount,BrandID) VALUES
-(N'Máy Tính T450',N'Máy nhập mới ',N'Chiếc','1000',10,111),				--1
-(N'Điện Thoại Nokia5670',N'Điện thoại đang hot ',N'Chiếc','200',28,666),	--2
-(N'Máy In Samsung 450',N'Máy in đang ế ',N'Chiếc','100',64,444),			--3
-(N'Điện Thoại 11O2',N'Máy đập không vỡ',N'Chiếc','500',107,666),			--4
-(N'Điện Thoại 110I',N'a sời ',N'Chiếc','100',5,333),	
-(N'Tai nghe 110I',N'Táo màu xám ',N'Chiếc','2000',11,555),	
-(N'Điện Thoại bấm bấm',N'nó kìa ',N'Chiếc','400',1,666),	
-(N'Máy In k3',N'bảo Hành mất Phí chọn đời ',N'Chiếc','600',6,777),	
-(N'Máy Tính Dell03',N'DELL Bảo hành chọn đời ',N'Chiếc','700',0,222),	
-(N'Máy Ảnh SONY01',N'lâu lâu dễ hỏng ',N'Chiếc','1000',50,888)	--5
+(N'Điện Thoại Nokia5670',N'Điện thoại đang hot ',N'Chiếc',200,28,666),	--2
+(N'Máy In Samsung 450',N'Máy in đang ế ',N'Chiếc',100,64,444),			--3
+(N'Điện Thoại 11O2',N'Máy đập không vỡ',N'Chiếc',500,107,666),			--4
+(N'Điện Thoại 110I',N'a sời ',N'Chiếc',100,5,333),	
+(N'Tai nghe 110I',N'Táo màu xám ',N'Chiếc',2000,11,555),	
+(N'Máy In k3',N'bảo Hành mất Phí chọn đời ',N'Chiếc',600,6,777),	
+(N'Máy Ảnh SONY01',N'lâu lâu dễ hỏng ',N'Chiếc',1000,50,888)	--5
+
+INSERT INTO PRODUCT(Name,Content,Unit,Price,Amount,BrandID) VALUES
+(N'Điện Thoại bấm bấm',N'nó kìa ',N'Chiếc',400,1,666),	
+(N'Máy Tính Dell03',N'DELL Bảo hành chọn đời ',N'Chiếc',700,0,222),
+(N'Máy Tính T450',N'Máy nhập mới ',N'Chiếc',1000,10,111)
+delete from PRODUCT
 
 /*
 3. Viết các câu lệnh để thêm dữ liệu vào các bảng
@@ -77,7 +80,8 @@ Cho vào hai dữ liệu tưng tự như bảng đề bài trên*/
 --b) Số mặt hàng mà cửa hàng bán.
 	SELECT COUNT(*) FROM PRODUCT
 --c) Tổng số loại sản phẩm của mỗi hãng có trong cửa hàng.
-	SELECT COUNT(BrandID)  AS SLSP, PRODUCT.BrandID FROM PRODUCT
+
+	SELECT count(BrandID)  AS SLSP, PRODUCT.BrandID FROM PRODUCT
 	WHERE PRODUCT.BrandID IN (SELECT BRAND.ID FROM BRAND) 
 	GROUP BY PRODUCT.BrandID
 	
@@ -134,15 +138,47 @@ Cho vào hai dữ liệu tưng tự như bảng đề bài trên*/
 	EXEC SP_SanPham_HetHang
 --d) Viết Trigger sau:
 --◦ TG_Xoa_Hang: Ngăn không cho xóa hãng
+CREATE TRIGGER TG_Xoa_SANPHAM
+ON PRODUCT FOR DELETE 
+AS 
+BEGIN
+	DECLARE @Count int =0
 
-/*
-CREATE TRIGGER tên_trigger  
-ON { Tên_bảng }   
-[ WITH <Options> ]  
-{ FOR | AFTER | INSTEAD OF }   
-{ [INSERT], [UPDATE] , [DELETE] }
-*/
+	SELECT  @Count = count(*) FROM deleted
+	WHERE deleted.Amount NOT LIKE 0
+	IF (@Count >0)
+	BEGIN 
+		PRINT 'ko duoc xoa'
+		ROLLBACK TRAN
+	END
+END
+
+DROP TRIGGER TG_Xoa_SANPHAM
 
 
-CREATE TRIGGER TG_Xoa_Hang
+
+
 --◦ TG_Xoa_SanPham: Chỉ cho phép xóa các sản phẩm đã hết hàng (số lượng = 0)
+
+ALTER TRIGGER TG_Xoa_SANPHAM
+ON PRODUCT FOR DELETE 
+AS 
+BEGIN
+	DECLARE @Count int =0,@ANY INT = 0
+	IF (EXISTS(SELECT * FROM deleted WHERE Amount not like 0 or Price >500))
+	BEGIN 
+		PRINT 'ko duoc xoa'
+		ROLLBACK TRAN
+	END
+END
+
+--DROP TRIGGER TG_Xoa_SANPHAM
+
+DELETE FROM PRODUCT WHERE PRODUCT.Price = 400
+
+DELETE FROM PRODUCT WHERE PRODUCT.Amount = 0
+
+SELECT Amount,Price FROM PRODUCT WHERE Amount LIKE 0 or Price <500
+select * from PRODUCT
+WHERE PRODUCT.Amount NOT LIKE 0 OR PRODUCT.Price > 500 
+GROUP BY Price
