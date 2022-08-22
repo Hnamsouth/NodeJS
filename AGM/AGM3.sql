@@ -87,7 +87,8 @@ Cho vào hai dữ liệu tưng tự như bảng đề bài trên*/
 	GROUP BY PRODUCT.BrandID
 	
 
---d) Tổng số đầu sản phẩm của toàn cửa hàng
+--d) Tổng số lượng sản phẩm của toàn cửa hàng
+	SELECT COUNT(*) AS SLSP FROM PRODUCT
 
 --7. Thay đổi những thay đổi sau trên cơ sở dữ liệu
 --a) Viết câu lệnh để thay đổi trường giá tiền của từng mặt hàng là dương(>0).
@@ -98,9 +99,9 @@ Cho vào hai dữ liệu tưng tự như bảng đề bài trên*/
 	ADD CHECK (PhoneNB LIKE '0%[0-9]')
 --c) Viết các câu lệnh để xác định các khóa ngoại và khóa chính của bảng
 
-	/*ALTER TABLE BRAND
-	ADD PRIMARY KEY (column...)
-	ADD FOREIGN KEY(column_table1) references (column_table2)*/
+	ALTER TABLE BRAND
+	--ADD PRIMARY KEY (column...)
+	ADD FOREIGN KEY(BrandID) REFERENCES BRAND(ID)
 
 --a) Thiết lập chỉ mục (Index) cho các cột sau: Tên hàng và Mô tả hàng để tăng hiệu suất truy vấndữ liệu từ 2 cột này
 	CREATE INDEX nPRD_ctPRD
@@ -109,13 +110,15 @@ Cho vào hai dữ liệu tưng tự như bảng đề bài trên*/
 --◦ View_SanPham: với các cột Mã sản phẩm, Tên sản phẩm, Giá bán
 	CREATE VIEW View_SanPham AS
 	SELECT ID,Name,Price FROM PRODUCT
+
 	SELECT * FROM View_SanPham
 
 --◦ View_SanPham_Hang: với các cột Mã SP, Tên sản phẩm, Hãng sản xuất
 
 	CREATE VIEW View_SPHang AS
-	SELECT PRODUCT.ID ,PRODUCT.Name,PRODUCT.Price,BRAND.Name AS BRAND FROM PRODUCT JOIN BRAND 
+	SELECT PRODUCT.ID AS MaSP ,PRODUCT.Name AS TenSP,BRAND.Name AS HangSX FROM PRODUCT JOIN BRAND 
 	ON BRAND.ID =PRODUCT.BrandID
+
 	SELECT * FROM View_SPHang
 --c) Viết các Store Procedure sau:
 --◦ SP_SanPham_TenHang: Liệt kê các sản phẩm với tên hãng truyền vào store
@@ -124,7 +127,7 @@ Cho vào hai dữ liệu tưng tự như bảng đề bài trên*/
 	WHERE PRODUCT.BrandID = 
 	(SELECT BRAND.ID FROM BRAND WHERE BRAND.Name LIKE @BRAND_NAME)
 
-	EXEC SP_SanPham_TenHang @BRAND_NAME='Nokia'
+	EXEC SP_SanPham_TenHang @BRAND_NAME='Nokia'  -- Aple,Samsung,Sony,Acer,Nokia
 --◦ SP_SanPham_Gia: Liệt kê các sản phẩm có giá bán lớn hơn hoặc bằng giá bán truyềnvào
 	CREATE PROCEDURE SP_SanPham_Gia @PRICE INT AS
 	SELECT *  FROM PRODUCT 
