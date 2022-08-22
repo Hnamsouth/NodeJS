@@ -122,6 +122,10 @@ Câu 4: Liệt kê thông tin của các nhà cung cấp -- đã từng đăng k
 thuộc hãng xe “Toyota”-- với mức phí có đơn giá là 15.000 VNĐ/km hoặc những dòng xe
 thuộc hãng xe “KIA” với mức phí có đơn giá là 20.000 VNĐ/km */
 --select * from NHACUNGCAP as NPC
+SELECT * FROM NHACUNGCAP AS NCC
+WHERE MaNhaCC IN 
+(SELECT MaNhaCC FROM DANGKYCUNGCAP AS DKCC WHERE DongXe = 
+(SELECT DongXe FROM DONGXE WHERE HangXe LIKE 'Toyota'
 
 SELECT * FROM NHACUNGCAP AS NCC
 JOIN DANGKYCUNGCAP AS DKCC ON NCC.MaNhaCC = DKCC.MaNhaCC
@@ -160,11 +164,10 @@ HangXe, NgayBatDauCC, NgayKetThucCC của tất cả các lần đăng ký cung 
 tiện với yêu cầu những nhà cung cấp nào chưa từng thực hiện đăng ký cung cấp phương
 tiện thì cũng liệt kê thông tin những nhà cung cấp đó ra*/
 
-SELECT *
+SELECT MaDKCC,DKCC.MaNhaCC,MaLoaiDV,DongXe,MaMP,NgayBatDauCungCap,NgayKetThucCungCap,SoLuongXeDangKy
 FROM DANGKYCUNGCAP  AS DKCC 
-LEFT JOIN NHACUNGCAP AS NCC
+FULL OUTER JOIN NHACUNGCAP AS NCC
 ON DKCC.MaNhaCC = NCC.MaNhaCC 
-ORDER BY DKCC.MaNhaCC;
 
 SELECT * FROM DANGKYCUNGCAP AS DKCC JOIN NHACUNGCAP AS NCC
 ON DKCC.MaNhaCC = NCC.MaNhaCC 
@@ -173,8 +176,12 @@ ON DKCC.MaNhaCC = NCC.MaNhaCC
 thuộc dòng xe “Hiace” hoặc từng đăng ký cung cấp phương tiện thuộc dòng xe “Cerato”*/
 
 SELECT * FROM NHACUNGCAP AS NCC
-JOIN DANGKYCUNGCAP AS DKCC ON NCC.MaNhaCC = DKCC.MaNhaCC
+RIGHT JOIN DANGKYCUNGCAP AS DKCC ON NCC.MaNhaCC = DKCC.MaNhaCC
 WHERE DKCC.DongXe like 'Hiace' or DKCC.DongXe like 'Cerato'
+
+SELECT * FROM NHACUNGCAP AS NCC
+WHERE NCC.MaNhaCC IN 
+(SELECT MaNhaCC FROM DANGKYCUNGCAP WHERE DongXe like 'Hiace' or DongXe like 'Cerato')
 
 /*Câu 10: Liệt kê thông tin của các nhà cung cấp chưa từng thực hiện đăng ký cung cấp
 phương tiện lần nào cả.*/
