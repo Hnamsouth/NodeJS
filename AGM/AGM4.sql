@@ -1,4 +1,4 @@
-﻿CREATE DATABASE AGM4
+﻿--CREATE DATABASE AGM4
 USE AGM4
 
 CREATE TABLE Type_Product(
@@ -18,6 +18,7 @@ CREATE TABLE Product(
 
 -- INSERT Type_Product
 INSERT INTO Type_Product VALUES
+('G789',N'Máy tính sách tay G789'),
 ('Z37E',N'Máy tính sách tay Z37'),
 ('A111',N'Điện thoại A111'),
 ('B222',N'Máy ảnh B222'),
@@ -32,6 +33,7 @@ INSERT INTO Manager_Product VALUES
 
 -- INSERT Product
 INSERT INTO Product VALUES
+('G789 465456','2012/05/12','G789',66666),
 ('Z37 111111','2009/10/22','Z37E',99999),
 ('Z37 222222','2010/12/02','Z37E',99999),
 ('Z37 333333','2009/03/12','Z37E',33333),
@@ -64,12 +66,17 @@ INSERT INTO Product VALUES
 --c) Liệt kê các sản phẩm của loại sản phẩm có mã số là Z37E.
 	SELECT * FROM Product where Product.Mlsp_TP = 'Z37E'
 --d) Liệt kê các sản phẩm Nguyễn Văn An chịu trách nhiệm theo thứ tự giảm đần của mã.
-	SELECT * FROM Product where Product.Manager_ID in (select Id from Manager_Product where Name =N'Nguyễn Văn A')
+	SELECT * FROM Product where Product.Manager_ID in (select Id from Manager_Product where Name like N'Nguyễn Văn A' )
+	ORDER BY Id DESC
 /*6. Viết các câu lệnh truy vấn để*/
 --a) Số lượng sản phẩm của từng loại sản phẩm.
 	SELECT COUNT(*) AS SL_SanPham,Mlsp_TP FROM  Product GROUP BY Product.Mlsp_TP
 --b) Số lượng sản phẩm trung bình theo loại sản phẩm.
-		
+		SELECT (CAST(COUNT(Id) AS float) /(SELECT count( DISTINCT Mlsp_TP )FROM  Product)) FROM  Product
+		-- CHIA 2 SO NGUYEN SE TRA VE 1 SO NGUYEN
+		SELECT (COUNT(Id)*1.0 /(SELECT count( DISTINCT Mlsp_TP )FROM  Product)) FROM  Product
+		-- decimal OR DEC tương tự như nhau
+		SELECT CAST(COUNT(Id)*1.0 /(SELECT count( DISTINCT Mlsp_TP )FROM  Product) AS decimal (10,2) ) FROM  Product
 	--c) Hiển thị toàn bộ thông tin về sản phẩm và loại sản phẩm.
 	SELECT * FROM Product JOIN Type_Product ON Product.Mlsp_TP= Type_Product.Mlsp
 --d) Hiển thị toàn bộ thông tin về người chịu trách nhiêm, loại sản phẩm và sản phẩm
