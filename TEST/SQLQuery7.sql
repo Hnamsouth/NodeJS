@@ -17,7 +17,7 @@ create table Publishions (
 	Address nvarchar(225),
 );
 -- khi đã tạo bảng rồi mà muốn thêm thuộc tính cho trường của bảng đó 
- alter table authors add primary key (Name)
+ alter table authors add constraint CK_pk_authors primary key (Name)
 
 create table Books(
 	id int primary key identity(1,1),
@@ -34,9 +34,6 @@ create table Books(
 -- nếu qh 1-1 thì thêm unique để ràng buộc
 -- nvarchar & varchar trong SQL và varchar trong Mysql
 
-drop table Books;
-drop table Publishions;
-drop table Authors;
-drop table Types;
+alter table Authors
 
 

@@ -92,6 +92,7 @@ Cho vào hai dữ liệu tưng tự như bảng đề bài trên*/
 
 --7. Thay đổi những thay đổi sau trên cơ sở dữ liệu
 --a) Viết câu lệnh để thay đổi trường giá tiền của từng mặt hàng là dương(>0).
+-- chú ý . nếu bảng đã có dữ liệu khi tạo CHECK cần phải chú ý đến ràng buộc và dữ liệu đã được nhập của các cột đã tạo từ trước phải đúng với điều kiện của check
 	ALTER TABLE PRODUCT
 	ADD CHECK (PRICE >0)
 --b) Viết câu lệnh để thay đổi số điện thoại phải bắt đầu bằng 0.
@@ -128,6 +129,7 @@ Cho vào hai dữ liệu tưng tự như bảng đề bài trên*/
 	(SELECT BRAND.ID FROM BRAND WHERE BRAND.Name LIKE @BRAND_NAME)
 
 	EXEC SP_SanPham_TenHang @BRAND_NAME='Nokia'  -- Aple,Samsung,Sony,Acer,Nokia
+	EXEC SP_SanPham_Gia @PRICE=600
 --◦ SP_SanPham_Gia: Liệt kê các sản phẩm có giá bán lớn hơn hoặc bằng giá bán truyềnvào
 	CREATE PROCEDURE SP_SanPham_Gia @PRICE INT AS
 	SELECT *  FROM PRODUCT 
@@ -182,7 +184,27 @@ BEGIN
 	END
 END
 -- VỚI NHỮNG ROW ĐÃ ĐƯỢC KHÓA NGOẠI THAM CHIẾU TỚI THÌ SẼ KO XÓA ĐƯỢC MÀ KO CẦN TỚI TRIGGER(VÌ ĐÃ BỊ RÀNG BUỘC)
+-- Hoặc có thể viết như này
+CREATE TRIGGER TG_Xoa_Hang2
+ON BRAND FOR DELETE AS 
+	BEGIN 
+		PRINT N'KHÔNG ĐxƯỢC XOA HÃNG'
+		ROLLBACK TRAN
+	END
 DELETE FROM BRAND WHERE BRAND.ID = 111
+-----------------
+CREATE TRIGGER TG_KdcGiam_SL
+ON PRODUCT FOR UPDATE AS
+BEGIN 
+	IF (SELECT Amount FROM inserted)> (SELECT Amount FROM PRODUCT )
+	BEGIN
+		PRINT 'KO DUOC TANG SL'
+		ROLLBACK TRAN
+	END
+END
+UPDATE PRODUCT SET Amount=110 WHERE PRODUCT.ID LIKE 37
+SELECT * FROM PRODUCT 
+
 
 --DROP TRIGGER XOASP2
 --DROP TRIGGER TG_Xoa_SANPHAM
