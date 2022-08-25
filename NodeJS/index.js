@@ -1,4 +1,5 @@
-const express = require('express')
+//const express = require('express')
+import express from 'express'
 
 
 const port = process.env.PORT || 4567
@@ -6,7 +7,7 @@ const port = process.env.PORT || 4567
 const app = express();
 
 app.listen(port, () => {
-    console.log("server running....!")
+    console.log(`server running....${port}`)
 })
 
 app.get("/", (req, res) => {
