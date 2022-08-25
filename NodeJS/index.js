@@ -28,10 +28,27 @@ con.query(qr1, (err, data, feilds) => {
             res.json(data)
         })
         //console.table(data)
-        //console.log(data)
-})
+        // console.log(feilds)
+});
 app.get("/api2", (req, res) => {
-    con.query(`select * from students`, (err, data) => {
+    var qr2 = 'select * from class'
+    con.query(qr2, (err, data) => {
+        res.send(data)
+    })
+});
+
+
+app.get("/sl-hs-moilop", (req, res) => {
+    var qr3 = 'SELECT count(*) as slHS,class.NAME as Class FROM `students` join class on students.ClassID=class.id group by class.id';
+    con.query(qr3, (err, data) => {
+        if (err) res.send("erro get data");
+        res.send(data)
+    })
+})
+app.get("/chonHS", (req, res) => {
+    var qr4 = 'select * from students where STN_Name = ?';
+    con.query(qr4, ['hoc sinh 1'], (err, data) => {
+        if (err) res.send("erro get data");
         res.send(data)
     })
 })
