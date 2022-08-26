@@ -1,4 +1,5 @@
-﻿create database Assignment_05
+﻿
+create database Assignment_05
 use Assignment_05
 
 
@@ -97,4 +98,8 @@ insert into Phone_Number values
 	insert into Custemers values (@Ten,@DiaChi,@NgaySinh)
 
 	EXEC SP_Them_DanhBa @Ten=N'Cu Tis',@DiaChi=N'Nguyện đi theo Tèo',@NgaySinh='2000/02/22'
---◦ SP_Tim_DanhBa: Tìm thông tin liên hệ của một người theo tên (gần đúng)	alter procedure SP_Tim_DanhBa @Timten nvarchar(50) as	select * from Custemers where  Ten like '%'+@Timten+'%'	exec SP_Tim_DanhBa @Timten='Tis'
+--◦ SP_Tim_DanhBa: Tìm thông tin liên hệ của một người theo tên (gần đúng)
+	alter procedure SP_Tim_DanhBa @Timten nvarchar(50) as
+	select * from Custemers where  Ten like '%'+@Timten+'%'
+
+	exec SP_Tim_DanhBa @Timten='Tis'
